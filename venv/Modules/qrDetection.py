@@ -63,6 +63,7 @@ while True:
         xDe = round(inter(xOut, 0, 1280, 0, 640))
         yDe = round(inter(yOut, 0, 720, 0, 480))
         dist = depth.get_distance(xDe, yDe)
+        
         if dist != 0:
             print(dist)
             dFile.write(str(dist))

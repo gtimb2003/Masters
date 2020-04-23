@@ -39,6 +39,7 @@ def interRev(Input, InputLow, InputHigh, OutputLow, OutputHigh):
     return (interpolate)
 
 
+
 arm = XArmAPI(ip)
 arm.motion_enable(enable=True)
 arm.set_mode(0)

@@ -25,4 +25,5 @@ while True:
     xInt = round(inter(x, 0, 1280, 0, 640))
     yInt = round(inter(y, 0, 720, 0, 480))
     dist = depth.get_distance(xInt, yInt)
+    
     print(dist)
