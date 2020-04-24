@@ -19,6 +19,16 @@ def inter(Input, InputLow, InputHigh, OutputLow, OutputHigh):
     interpolate = ((Input - InputLow) / (InputHigh - InputLow)) * (OutputHigh - OutputLow) + OutputLow
     return (interpolate)
 
+# def avDepth(x, y, xOffset, yOffset, frame):
+#     b = 1
+#     for i in range(x, xOffset):
+#         for k in range(y, yOffset):
+#             a = frame.get_distance(i, k)
+#             b = b + a
+#     averageDepth = b / (x * y)
+#     return(averageDepth)
+
+
 
 while True:
     #QR Reading code
@@ -39,8 +49,8 @@ while True:
         xW = int(pts2[2])
         yW = int(pts2[3])
         #Add half of the width to get center coordinates
-        xOut = x + xW // 2
-        yOut = y + yW // 2
+        xOut = round(x + (xW / 2))
+        yOut = round(y + (yW / 2))
 
         #Open files to store coordinates
         filepathX = "C:\\Users\\geo_t\\PycharmProjects\\xArm\\venv\\Modules\\Docs\\xCoor.txt"
@@ -60,14 +70,13 @@ while True:
 
 
         #DEPTH STUFF
-        xDe = round(inter(xOut, 0, 1280, 0, 640))
-        yDe = round(inter(yOut, 0, 720, 0, 480))
+        xDe = round(inter(int(pts2[0]), 0, 1280, 0, 320))
+        yDe = round(inter(int(pts2[1]), 0, 720, 0, 240))
         dist = depth.get_distance(xDe, yDe)
-        
-        if dist != 0:
-            print(dist)
-            dFile.write(str(dist))
-            dFile.close()
+
+        print(dist)
+        dFile.write(str(dist))
+        dFile.close()
 
 
 
