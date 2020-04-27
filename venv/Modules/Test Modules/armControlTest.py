@@ -38,9 +38,6 @@ arm = XArmAPI(ip)
 arm.motion_enable(enable=True)
 arm.set_mode(0)
 arm.set_state(state=0)
-arm.reset(wait=True)
-
-arm.set_position(350, -283, 120, 0, 0, 0, speed=100, wait=True)
 
 
-print(np.round(np.rad2deg(arm.angles)))
+arm.set_position(5, 599, 500, 180, 0, 87, speed=60, wait=True)
