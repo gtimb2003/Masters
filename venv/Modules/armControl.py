@@ -53,6 +53,8 @@ def remap(x, oMin, oMax, nMin, nMax):
         result = newMax - portion
 
     return result
+
+
 # Interpolation Function End
 
 # xArm init
@@ -70,7 +72,7 @@ arm.set_gripper_speed(5000)
 birdEye = [0, 3.3, 0, 116, 0, 112, 0]  # Default Birdseye view
 sLoc = [-146.4, 3.5, 5, 40, 0, 36, 0]
 standBy = [0, -65, 0, 69, 0, 113.4, 0]
-# camera area calibration
+# camera area calibration DLT
 camR = 1143
 camL = 237
 camB = 509
@@ -82,21 +84,21 @@ xArmR = -402.1
 xArmL = 284.7
 # Paths
 filepathX = "C:\\Users\\geo_t\\PycharmProjects\\xArm\\venv\\Modules\\Docs\\xCoor.txt"
-filepathtY = "C:\\Users\\geo_t\\PycharmProjects\\xArm\\venv\\Modules\\Docs\\yCoor.txt"
+filepathY = "C:\\Users\\geo_t\\PycharmProjects\\xArm\\venv\\Modules\\Docs\\yCoor.txt"
+filepathA = "C:\\Users\\geo_t\\PycharmProjects\\xArm\\venv\\Modules\\Docs\\angle.txt"
 
 # Goto default Birdseye view
 arm.set_servo_angle(angle=standBy, speed=50, wait=True)
 # Default gripper opening
-arm.set_gripper_position(1000, wait=True)
+arm.set_gripper_position(500, wait=True)
 
 while True:
     arm.set_servo_angle(angle=standBy, speed=50, wait=True)
     # Read the files for the location of the QR Code
     xFile = open(filepathX, "r+")
-    yFile = open(filepathtY, "r+")
+    yFile = open(filepathY, "r+")
 
     # In case of an out of range situation, multiple reads of the file can crash the code that is why I put this delay
-
 
     # inverted x and y because camera and robot has different point of reference
     # read value from file, interpolate it and store it
@@ -115,7 +117,8 @@ while True:
         time.sleep(2)
         # Read the files for the location of the QR Code
         xFile = open(filepathX, "r+")
-        yFile = open(filepathtY, "r+")
+        yFile = open(filepathY, "r+")
+        aFile = open(filepathA, "r+")
 
         # In case of an out of range situation, multiple reads of the file can crash the code that is why I put this delay
         time.sleep(1)
@@ -124,40 +127,39 @@ while True:
         # read value from file, interpolate it and store it
         yPre = int(yFile.read())
         xPre = int(xFile.read())
+        angle = int(aFile.read())  # read angle
 
         xInt = round(remap(yPre, camB, camT, xArmB, xArmT))
         yInt = round(remap(xPre, camR, camL, xArmR, xArmL))
+        aInt = round(angle)
 
         # close the file for stability
         xFile.close()
         yFile.close()
+        aFile.close()
 
         print(xInt, yInt)
-        # arm.set_servo_angle(angle=[0, 0, 0, xInt, 0, 0, yInt], speed=100, wait=True)
         # Check if QR is within limit
-        if xArmB <= xInt <= xArmT:
-            if xArmR <= yInt <= xArmL:
+        if xArmB <= xInt <= xArmT and xArmR <= yInt <= xArmL:
+            time.sleep(1)
+            # Go to position of QR
+            arm.set_position(xInt, yInt, 140, 0, 0, 0, speed=100, wait=True)
+            # Grab fixture
+            arm.set_gripper_position(90, wait=True)
 
+            # return to bird eye position
+            arm.set_servo_angle(angle=birdEye, speed=50, wait=True)
 
-                time.sleep(1)
-                # Go to position of QR
-                arm.set_position(xInt, yInt, 130, 0, 0, 0, speed=100, wait=True)
+            # move to storage location
+            arm.set_servo_angle(angle=sLoc, speed=50, wait=True)
+            arm.set_gripper_position(500, wait=True)
+            arm.set_servo_angle(angle=[-146.4, 3.5, 5, 80, 0, 36, 0], speed=50, wait=True)
 
-                # Grab fixture
-                arm.set_gripper_position(90, wait=True)
+            # arm.set_position(5, 599, 500, 180, 0, 87, speed=60, wait=True)
 
-                # return to bird eye position
-                arm.set_servo_angle(angle=birdEye, speed=50, wait=True)
-
-                # move to storage location
-                arm.set_servo_angle(angle=sLoc, speed=50, wait=True)
-
-                # arm.set_position(5, 599, 500, 180, 0, 87, speed=60, wait=True)
-                arm.set_gripper_position(500, wait=True)
-
-                # retract arm
-                #arm.set_servo_angle(angle=[-59, -27, 117, 124, 34, 173, -13], speed=50, wait=True)
-                arm.set_servo_angle(angle=birdEye, speed=50, wait=True)
+            # retract arm
+            # arm.set_servo_angle(angle=[-59, -27, 117, 124, 34, 173, -13], speed=50, wait=True)
+            arm.set_servo_angle(angle=birdEye, speed=50, wait=True)
 
     else:
         print("No QR")

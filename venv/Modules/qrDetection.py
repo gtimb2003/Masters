@@ -18,8 +18,8 @@ depth = frames.get_depth_frame()
 
 # Variables
 filepathX = "C:\\Users\\geo_t\\PycharmProjects\\xArm\\venv\\Modules\\Docs\\xCoor.txt"
-filepathtY = "C:\\Users\\geo_t\\PycharmProjects\\xArm\\venv\\Modules\\Docs\\yCoor.txt"
-filepathtD = "C:\\Users\\geo_t\\PycharmProjects\\xArm\\venv\\Modules\\Docs\\dCoor.txt"
+filepathY = "C:\\Users\\geo_t\\PycharmProjects\\xArm\\venv\\Modules\\Docs\\yCoor.txt"
+filepathA = "C:\\Users\\geo_t\\PycharmProjects\\xArm\\venv\\Modules\\Docs\\angle.txt"
 
 while True:
     # QR Reading code
@@ -31,7 +31,7 @@ while True:
     yOut = 0
 
     xFile = open(filepathX, "w+")
-    yFile = open(filepathtY, "w+")
+    yFile = open(filepathY, "w+")
 
     xFile.write(str(xOut))
     yFile.write(str(yOut))
@@ -45,50 +45,62 @@ while True:
         # using polygons in order to have direction
         pts = np.array([barcode.polygon], np.int32)
         pts = pts.reshape(-1, 1, 2)
-        cv2.polylines(img, [pts], True, (255, 0, 255), 5)
+        cv2.polylines(img, [pts], True, (255, 0, 0), 5)
+
+
+        # barcode.rect is the rectangle that encloses the qr code
         pts2 = barcode.rect
         cv2.putText(img, myData, (pts2[0], pts2[1]), cv2.FONT_HERSHEY_SIMPLEX,
                     0.9, (255, 0, 255), 1)
         # pts2 contains the x,y coordinates of the corner of the QR code and the width of each side
-        x = int(pts2[0])
-        y = int(pts2[1])
-        xW = int(pts2[2])
-        yW = int(pts2[3])
-        # Add half of the width to get center coordinates
-        xOut = round(x + (xW / 2))
-        yOut = round(y + (yW / 2))
 
-        # dx = xOut - x
-        # dy = yOut - y
-        # angle = math.atan2(dy, dx)
-        # print(math.degrees(angle))
+        ################
+        poly = barcode.polygon # .polygon creates an array with coordinates of each corner of the qr code
+
+        #Take the 2 bottom corners
+        xy2 = poly[2]
+        x2 = int(xy2[0])
+        y2 = int(xy2[1])
+
+        xy3 = poly[3]
+        x3 = int(xy3[0])
+        y3 = int(xy3[1])
+
+        # get angle of bottom
+        myradians = math.atan2(y2 - y3, x2 - x3)
+        mydegrees = round(math.degrees(myradians))
+
+        #calculate the midpoint between the two bottom points
+        xOut = int((x3 + x2) / 2)
+        yOut = int((y3 + y2) / 2)
+
+
+
+        ################
+        # x = int(pts2[0])
+        # y = int(pts2[1])
+        # xW = int(pts2[2])
+        # yW = int(pts2[3])
+        # # Add half of the width to get center coordinates
+        # xOut = round(x + (xW / 2))
+        # yOut = round(y + (yW / 2))
+
 
         # Open files to store coordinates
-        filepathX = "C:\\Users\\geo_t\\PycharmProjects\\xArm\\venv\\Modules\\Docs\\xCoor.txt"
         xFile = open(filepathX, "w+")
-        filepathtY = "C:\\Users\\geo_t\\PycharmProjects\\xArm\\venv\\Modules\\Docs\\yCoor.txt"
-        yFile = open(filepathtY, "w+")
-        # filepathtD = "C:\\Users\\geo_t\\PycharmProjects\\xArm\\venv\\Modules\\Docs\\dCoor.txt"
-        # dFile = open(filepathtD, "w+")
+        yFile = open(filepathY, "w+")
+        aFile = open(filepathA, "w+")
 
         xFile.write(str(xOut))
         yFile.write(str(yOut))
+        aFile.write(str(mydegrees))
 
         xFile.close()
         yFile.close()
+        aFile.close()
 
         time.sleep(1)
-
-        print(xOut, yOut)
-
-        # # DEPTH STUFF
-        # xDe = round(inter(int(pts2[0]), 0, 1280, 0, 320))
-        # yDe = round(inter(int(pts2[1]), 0, 720, 0, 240))
-        # dist = depth.get_distance(xDe, yDe)
-        #
-        # print(dist)
-        # dFile.write(str(dist))
-        # dFile.close()
+        print(xOut, yOut, mydegrees)
 
     cv2.imshow('Result', img)
     cv2.waitKey(1)
