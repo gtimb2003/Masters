@@ -4,6 +4,7 @@ from pyzbar.pyzbar import decode
 import pandas as pd
 import time
 import pyrealsense2 as rs
+import math
 
 cap = cv2.VideoCapture(0)
 cap.set(3, 1280)
@@ -57,13 +58,18 @@ while True:
         xOut = round(x + (xW / 2))
         yOut = round(y + (yW / 2))
 
+        # dx = xOut - x
+        # dy = yOut - y
+        # angle = math.atan2(dy, dx)
+        # print(math.degrees(angle))
+
         # Open files to store coordinates
         filepathX = "C:\\Users\\geo_t\\PycharmProjects\\xArm\\venv\\Modules\\Docs\\xCoor.txt"
         xFile = open(filepathX, "w+")
         filepathtY = "C:\\Users\\geo_t\\PycharmProjects\\xArm\\venv\\Modules\\Docs\\yCoor.txt"
         yFile = open(filepathtY, "w+")
-        filepathtD = "C:\\Users\\geo_t\\PycharmProjects\\xArm\\venv\\Modules\\Docs\\dCoor.txt"
-        dFile = open(filepathtD, "w+")
+        # filepathtD = "C:\\Users\\geo_t\\PycharmProjects\\xArm\\venv\\Modules\\Docs\\dCoor.txt"
+        # dFile = open(filepathtD, "w+")
 
         xFile.write(str(xOut))
         yFile.write(str(yOut))
