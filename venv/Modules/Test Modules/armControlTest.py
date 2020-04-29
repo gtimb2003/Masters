@@ -40,4 +40,5 @@ arm.set_mode(0)
 arm.set_state(state=0)
 
 
-arm.set_position(5, 599, 500, 180, 0, 87, speed=60, wait=True)
+birdEye = [0, 3.3, 0, 116, 0, 112, 0]  # Default Birdseye view
+arm.set_servo_angle(angle=birdEye, speed=50, wait=True)

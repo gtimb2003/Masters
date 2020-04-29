@@ -8,6 +8,8 @@ import csv
 import cv2
 from pyzbar.pyzbar import decode
 import pyrealsense2 as rs
+from pyzbar.pyzbar import decode
+import pyrealsense2 as rs
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../..'))
 from xarm.wrapper import XArmAPI
@@ -53,9 +55,6 @@ def remap(x, oMin, oMax, nMin, nMax):
         result = newMax - portion
 
     return result
-
-
-# Interpolation Function End
 
 # xArm init
 arm = XArmAPI(ip)

@@ -102,5 +102,6 @@ while True:
         time.sleep(1)
         print(xOut, yOut, mydegrees)
 
+
     cv2.imshow('Result', img)
     cv2.waitKey(1)
