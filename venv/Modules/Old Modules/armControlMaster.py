@@ -55,7 +55,10 @@ def remap(x, oMin, oMax, nMin, nMax):
         result = newMax - portion
 
     return result
-
+# Connect to xArm
+parser = ConfigParser()
+parser.read('C:\\Users\\geo_t\\PycharmProjects\\xArm\\xarm\\wrapper\\robot.conf')
+ip = parser.get('xArm', 'ip')
 
 # xArm init
 arm = XArmAPI(ip)
