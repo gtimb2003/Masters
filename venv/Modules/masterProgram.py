@@ -112,8 +112,6 @@ cap.set(4, 720)
 while True:
     frames = pipeline.wait_for_frames()
     depth = frames.get_depth_frame()
-
-
     success, img = cap.read()
 
     arm.set_servo_angle(angle=standBy, speed=speed, wait=True)
@@ -133,8 +131,8 @@ while True:
         y3 = int(xy3[1])
 
         # get angle of bottom
-        myradians = math.atan2(y2 - y3, x2 - x3)
-        mydegrees = round(math.degrees(myradians))
+        radians = math.atan2(y2 - y3, x2 - x3)
+        degrees = round(math.degrees(radians))
 
         # calculate the midpoint between the two bottom points
         xPos = int((x3 + x2) / 2)
@@ -142,7 +140,7 @@ while True:
         xLoc = round(remap(yPos, camB, camT, xArmB, xArmT))
         yLoc = round(remap(xPos, camR, camL, xArmR, xArmL))
         print(xLoc, yLoc)
-        print(mydegrees)
+        print(degrees)
         dp = (maxHeight-depth.get_distance(xPos, yPos))
         print(dp)
 
@@ -150,7 +148,7 @@ while True:
             # Reset Position to avoid singularities
             arm.set_servo_angle(angle=sLocRes, speed=speed, wait=True)
             # Input angle of qr
-            arm.set_servo_angle(angle=[sLocRes[0], sLocRes[1], sLocRes[2], sLocRes[3], sLocRes[4], sLocRes[5], mydegrees], speed=speed, wait=True)
+            arm.set_servo_angle(angle=[sLocRes[0], sLocRes[1], sLocRes[2], sLocRes[3], sLocRes[4], sLocRes[5], degrees], speed=speed, wait=True)
             # Go to position of QR
             arm.set_position(xLoc, yLoc, dp, 0, 0, 0, wait=True)
             # Grab fixture
