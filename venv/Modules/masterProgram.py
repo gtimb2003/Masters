@@ -12,6 +12,13 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../../..'))
 from xarm.wrapper import XArmAPI
 from configparser import ConfigParser
 
+pipeline = rs.pipeline()
+config = rs.config()
+config.enable_stream(rs.stream.depth, 1280, 720, rs.format.z16, 6)
+pipeline.start(config)
+
+
+
 # Connect to xArm
 parser = ConfigParser()
 parser.read('C:\\Users\\geo_t\\PycharmProjects\\xArm\\xarm\\wrapper\\robot.conf')
@@ -71,6 +78,7 @@ birdEye = [0.0, 3.3000077168354895, 0.0, 116.00000387815524, 4.119222772313541, 
 sLoc = [-65.2, 27.9, 0, 56.1, -0.2, 27.8, -65]
 sLocRes = [0, 7, 0, 107, 0, 100, 0]
 standBy = [0, -65, 0, 69, 0, 113.4, 0]
+maxHeight = 541.3
 # camera area calibration DLT
 camL = 390
 camR = 1127
@@ -102,6 +110,10 @@ cap.set(3, 1280)
 cap.set(4, 720)
 
 while True:
+    frames = pipeline.wait_for_frames()
+    depth = frames.get_depth_frame()
+
+
     success, img = cap.read()
 
     arm.set_servo_angle(angle=standBy, speed=speed, wait=True)
@@ -131,32 +143,29 @@ while True:
         yLoc = round(remap(xPos, camR, camL, xArmR, xArmL))
         print(xLoc, yLoc)
         print(mydegrees)
+        dp = (maxHeight-depth.get_distance(xPos, yPos))
+        print(dp)
 
         if xArmB <= xLoc <= xArmT and xArmR <= yLoc <= xArmL:
-            # Go to position of QR
+            # Reset Position to avoid singularities
             arm.set_servo_angle(angle=sLocRes, speed=speed, wait=True)
-            arm.set_servo_angle(angle=[0, 7, 0, 107, 0, 100, mydegrees], speed=speed, wait=True)
-            arm.set_position(xLoc, yLoc, 139, 0, 0, 0, wait=True)
-            # a = arm.get_inverse_kinematics([xLoc, yLoc, 135, 0, 0, 0])
-            # arm.set_servo_angle(angle=a[1], speed=speed, wait=True)
-            arm.set_state(state=0)
+            # Input angle of qr
+            arm.set_servo_angle(angle=[sLocRes[0], sLocRes[1], sLocRes[2], sLocRes[3], sLocRes[4], sLocRes[5], mydegrees], speed=speed, wait=True)
+            # Go to position of QR
+            arm.set_position(xLoc, yLoc, dp, 0, 0, 0, wait=True)
             # Grab fixture
             arm.set_gripper_position(60, wait=True)
-            arm.set_state(state=0)
             # return to bird eye position
             arm.set_servo_angle(angle=birdEye, speed=speed, wait=True)
-            arm.set_state(state=0)
             # move to storage location
             arm.set_servo_angle(angle=sLoc, speed=speed, wait=True)
-            arm.set_state(state=0)
             # Release
             arm.set_gripper_position(800, wait=True)
-            arm.set_state(state=0)
             # retract arm
             arm.set_servo_angle(servo_id=2, angle=-40, speed=speed, wait=True)
-            arm.set_state(state=0)
             # Return to BirdEye before going standby
             arm.set_servo_angle(angle=birdEye, speed=speed, wait=True)
+            # Reset arm in case of failure
             arm.set_state(state=0)
     else:
         print("No QR or QR out of bounds")
