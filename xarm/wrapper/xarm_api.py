@@ -1513,7 +1513,7 @@ class XArmAPI(object):
         """
         Get inverse kinematics
         
-        :param pose: [x(mm), y(mm), z(mm), roll(rad or °), pitch(rad or °), yaw(rad or °)]
+        :param pose: [x(mm), y(mm), z(mm),set_position roll(rad or °), pitch(rad or °), yaw(rad or °)]
             Note: the roll/pitch/yaw unit is radian if input_is_radian is True, else °
         :param input_is_radian: the param pose value(only roll/pitch/yaw) is in radians or not, default is self.default_is_radian
         :param return_is_radian: the returned value is in radians or not, default is self.default_is_radian
